@@ -5,10 +5,19 @@
 # See documentation in:
 # http://doc.scrapy.org/en/latest/topics/items.html
 
-import scrapy
+from scrapy import Item,Field
 
 
-class ZhihuuserItem(scrapy.Item):
+class UserItem(Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+    id = Field()
+    name = Field()
+    avatar_url = Field()
+    gender = Field()
+    badge = Field()
+    employments = Field()
+    follower_count = Field()
+    headline = Field()
+    url = Field()
+    url_token = Field()
