@@ -22,12 +22,12 @@ class ZhihuSpider(Spider):
     follows_query = 'data[*].answer_count,articles_count,gender,follower_count,is_followed,is_following,badge[?(type=best_answerer)].topics'
 
     def start_requests(self):
-        # 实现构造url
+        # 实现构造用户自己和其关注的人的json的url
         yield Request(self.user_url.format(user=self.start_user, include=self.user_query), self.parse_user)
         yield Request(self.follows_url.format(user=self.start_user, include=self.follows_query, offset=0, limit=20), callback=self.parse_follows)
 
     def parse_user(self, response):
-        # 将返回的json赋值给item
+        # 将返回的轮子哥的json赋值给item输出
         result = json.loads(response.text)
         item = UserItem()
         for field in item.fields:
@@ -35,7 +35,11 @@ class ZhihuSpider(Spider):
                 item[field] = result.get(field)
         yield item
 
+        # 层层递归，根据轮子哥关注的人的url_token获取轮子哥关注的人的关注的人的列表
+        yield Request(self.follows_url.format(user=result.get('url_token'), include=self.follows_query, limit=20, offset=0), self.parse_follows)
+
     def parse_follows(self, response):
+        # 将返回的轮子哥关注的人的json输出
         results = json.loads(response.text)
 
         if 'data' in results.keys():
